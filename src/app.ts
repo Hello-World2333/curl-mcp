@@ -9,6 +9,7 @@ import { ANSI_COLORS } from './utils/colors.js';
 import { imageRecognition } from './middlewares/imageRecognition.js';
 import { generateRandomString } from './utils/utils.js';
 import config from './config/config.js';
+import { VM } from 'vm2';
 
 // Create an MCP server
 const server = new McpServer({
@@ -112,6 +113,68 @@ server.registerTool(
                 },
             ],
         };
+    },
+);
+
+server.registerTool(
+    'browser_control',
+    {
+        title: 'browser_control',
+        description:
+            '执行任意 JavaScript 代码，可获取到 page 对象本身(类型为 puppeteer.Page)，可以对页面进行任意操作。page 对象将被注入到全局变量中，可直接使用。\n' +
+            '默认超时 10 秒。代码最后的 return 将被返回。\n' +
+            '本工具可以代替 browser_eval，更好的进行页面操作。\n' +
+            '代码运行在 node.js 上下文，没有 document 对象。\n' +
+            '代码外部将自动包裹 async IIFE 和 try...catch，无需手动添加。',
+        inputSchema: z.object({
+            code: z.string(),
+            pageId: z.string(),
+        }),
+    },
+    async (args, context) => {
+        try {
+            console.log('[browser_control]', util.inspect(args, { colors: true, depth: null }));
+            const vm = new VM({
+                sandbox: {
+                    page: pages.get(args.pageId),
+                    setTimeout: setTimeout,
+                    clearTimeout: clearTimeout,
+                    setInterval: setInterval,
+                    clearInterval: clearInterval,
+                },
+                timeout: 10000,
+                eval: false,
+                wasm: false,
+                allowAsync: true,
+            });
+            const code = `
+            (async () => {
+                try {
+                    ${args.code}
+                } catch (error) {
+                    return { error: error.message || '执行错误' };
+                }
+            })()`;
+            const res = await vm.run(code);
+            console.log(res);
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify(res),
+                    },
+                ],
+            };
+        } catch (error: any) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({ error: error.message || '执行错误' }),
+                    },
+                ],
+            };
+        }
     },
 );
 

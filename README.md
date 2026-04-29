@@ -41,3 +41,10 @@ A: 没有加载环境变量导致的
 
 Q: 我可以在浏览器里登录账号吗?  
 A: 可以，本项目配置了持久化，登录状态会保留
+
+
+## footer
+
+> 警告: `browser_control工具采用了不安全的`vm2`沙盒  
+> 如果你担心安全风险，可以在配置文件内将`.disabledBrowserControlTool`设置为`true`以禁用此工具
+

@@ -8,4 +8,5 @@ export const configSchema = z.object({
     browser: z.object({
         headless: z.boolean(),
     }),
+    disabledBrowserControlTool: z.boolean().default(false),
 });
