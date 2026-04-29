@@ -1,0 +1,27 @@
+{
+    "name": "curl-mcp",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node dist/app.js",
+        "dev": "tsx watch src/app.ts",
+        "build": "tsc"
+    },
+    "keywords": [],
+    "author": "",
+    "type": "module",
+    "license": "ISC",
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "1.25.3",
+        "express": "^5.2.1",
+        "openai": "^6.34.0",
+        "puppeteer": "^24.42.0"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.6",
+        "tsx": "^4.21.0",
+        "typescript": "^6.0.3"
+    }
+}

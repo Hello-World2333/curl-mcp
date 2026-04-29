@@ -1,0 +1,9 @@
+{
+    "imageRecognition": {
+        "model": "mimo-v2-omni",
+        "baseURL": "https://api.xiaomimimo.com/v1"
+    },
+    "browser": {
+        "headless": false
+    }
+}

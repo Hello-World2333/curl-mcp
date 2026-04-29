@@ -1,0 +1,5 @@
+node_modules/
+browser_data/
+dist/
+.env
+config.json
