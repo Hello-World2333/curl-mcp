@@ -109,3 +109,24 @@ export async function imageRecognition(
     console.log(ANSI_COLORS.RESET);
     return result;
 }
+
+/**
+ * 调用 uapis API 进行 OCR 识别
+ * @param image base64 编码的图片
+ */
+export async function OCR(image: string) {
+    const fromData = new FormData();
+    fromData.append('image_base64', image);
+    fromData.append('need_location', 'false');
+    fromData.append('return_markdown', 'true');
+    fromData.append('enable_cls', 'false');
+    const res = await fetch('https://uapis.cn/api/v1/image/ocr', {
+        method: 'POST',
+        body: fromData,
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        throw new Error(data.message);
+    }
+    return data.markdown;
+}

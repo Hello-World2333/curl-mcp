@@ -6,7 +6,7 @@ import cors from 'cors';
 import util from 'util';
 import puppeteer from 'puppeteer';
 import { ANSI_COLORS } from './utils/colors.js';
-import { imageRecognition } from './middlewares/imageRecognition.js';
+import { imageRecognition, OCR } from './middlewares/imageRecognition.js';
 import { generateRandomString } from './utils/utils.js';
 import config from './config/config.js';
 import { VM } from 'vm2';
@@ -260,12 +260,13 @@ server.registerTool(
     {
         title: 'browser_screenshot',
         description:
-            '对指定页面进行截图，并调用 AI 识别图片内容。focus 参数可用于向 AI 指定要关注的区域。\n' +
+            '对指定页面进行截图，并根据所选方式识别图片内容。focus 参数仅在 recognizer 为 "ai" 时有效，可用于向 AI 指定要关注的区域。\n' +
             'fullPage 为 false 时，仅截取当前可见范围，为 true 时截取整个页面(自动滚动)。',
         inputSchema: z.object({
             pageId: z.string(),
             fullPage: z.boolean().optional().default(false),
             focus: z.string().optional(),
+            recognizer: z.enum(['ai', 'ocr']),
         }),
     },
     async (args, context) => {
@@ -294,23 +295,49 @@ server.registerTool(
             const imageDataUrl = `data:image/png;base64,${base64}`;
 
             console.log('[browser_screenshot] 开始识别图片...');
-            const recognitionResult = await imageRecognition(imageDataUrl, focus);
+            if (args.recognizer === 'ocr') {
+                console.log('[browser_screenshot] 使用 OCR 识别图片');
+                const start = Date.now();
+                const ocrResult = await OCR(imageDataUrl);
+                console.log('识别结果:\n' + ANSI_COLORS.GREEN + ocrResult + ANSI_COLORS.RESET);
+                console.log(
+                    ANSI_COLORS.YELLOW + '耗时:' + (Date.now() - start) + 'ms' + ANSI_COLORS.RESET,
+                );
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: JSON.stringify(
+                                {
+                                    success: true,
+                                    body: ocrResult,
+                                },
+                                null,
+                                2,
+                            ),
+                        },
+                    ],
+                };
+            } else {
+                console.log('[browser_screenshot] 使用 AI 识别图片');
+                const recognitionResult = await imageRecognition(imageDataUrl, focus);
 
-            return {
-                content: [
-                    {
-                        type: 'text',
-                        text: JSON.stringify(
-                            {
-                                success: true,
-                                body: recognitionResult,
-                            },
-                            null,
-                            2,
-                        ),
-                    },
-                ],
-            };
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: JSON.stringify(
+                                {
+                                    success: true,
+                                    body: recognitionResult,
+                                },
+                                null,
+                                2,
+                            ),
+                        },
+                    ],
+                };
+            }
         } catch (error: any) {
             return {
                 content: [
