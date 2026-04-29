@@ -98,7 +98,7 @@ server.registerTool(
         title: 'browser_eval',
         description:
             '在指定页面中执行 JavaScript 代码。可用于获取页面元素信息，关闭弹窗等\n' +
-            '代码运行在浏览器页面上下文，可以访问 document、window 等浏览器 API。不能使用 return',
+            '代码运行在浏览器页面上下文，可以访问 document、window 等浏览器 API。不能使用 return，最后一个表达式将被返回',
         inputSchema: z.object({
             code: z.string(),
             pageId: z.string(),
