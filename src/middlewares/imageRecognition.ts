@@ -21,6 +21,7 @@ const openai = new Openai({
 const PROMPT = `
 You are an OCR assistant.
 
+Only identify the scope of the following requirements:
 {{ focus }}
 
 For each element, specify:
