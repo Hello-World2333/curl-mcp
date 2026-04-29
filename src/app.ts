@@ -258,7 +258,8 @@ server.registerTool(
     {
         title: 'browser_screenshot',
         description:
-            '对指定页面进行截图（可选全页截图），并调用 AI 识别图片内容。focus 参数可用于向 AI 指定要关注的区域',
+            '对指定页面进行截图，并调用 AI 识别图片内容。focus 参数可用于向 AI 指定要关注的区域。\n' +
+            'fullPage 为 false 时，仅截取当前可见范围，为 true 时截取整个页面(自动滚动)。',
         inputSchema: z.object({
             pageId: z.string(),
             fullPage: z.boolean().optional().default(false),
