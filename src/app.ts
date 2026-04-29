@@ -96,7 +96,9 @@ server.registerTool(
     'browser_eval',
     {
         title: 'browser_eval',
-        description: '在指定页面中执行 JavaScript 代码。可用于获取页面元素信息，关闭弹窗等',
+        description:
+            '在指定页面中执行 JavaScript 代码。可用于获取页面元素信息，关闭弹窗等\n' +
+            '代码运行在浏览器页面上下文，可以访问 document、window 等浏览器 API。不能使用 return',
         inputSchema: z.object({
             code: z.string(),
             pageId: z.string(),
@@ -123,7 +125,7 @@ server.registerTool(
         description:
             '执行任意 JavaScript 代码，可获取到 page 对象本身(类型为 puppeteer.Page)，可以对页面进行任意操作。page 对象将被注入到全局变量中，可直接使用。\n' +
             '默认超时 10 秒。代码最后的 return 将被返回。\n' +
-            '本工具可以代替 browser_eval，更好的进行页面操作。\n' +
+            '本工具可以更好的进行页面操作。\n' +
             '代码运行在 node.js 上下文，没有 document 对象。\n' +
             '代码外部将自动包裹 async IIFE 和 try...catch，无需手动添加。',
         inputSchema: z.object({
